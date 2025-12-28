@@ -19,7 +19,7 @@ const raw = JSON.stringify(house);
 
 export function tokenize(raw: string): string[] {
   let buffer = "";
-  let tokens = [];
+  let tokens: string[] = [];
 
   for (let cursor = 0; cursor < raw.length; cursor++) {
     const current = raw.charAt(cursor);
@@ -52,7 +52,11 @@ export function tokenize(raw: string): string[] {
         buffer += current;
     }
   }
-  tokens.push("}");
+  const lastChar = raw.at(raw.length - 1);
+  if (!lastChar) {
+    throw new Error("Failed to get the last character");
+  }
+  tokens.push(lastChar);
 
   return tokens;
 }
