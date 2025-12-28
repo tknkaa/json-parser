@@ -1,0 +1,13 @@
+{
+  "name": "json-parser",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "js-tokens": "^10.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
