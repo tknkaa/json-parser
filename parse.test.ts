@@ -1,0 +1,13 @@
+import { expect, test } from "bun:test";
+import { correctlyTokenize } from "./token";
+import { parse } from "./parse";
+
+test("string", () => {
+  const house = {
+    table: "big",
+  };
+  const raw = JSON.stringify(house);
+  const tokens = correctlyTokenize(raw);
+  const obj = parse(tokens);
+  expect(obj).toEqual(house);
+});
