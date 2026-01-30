@@ -1,5 +1,13 @@
 import jsTokens from "js-tokens";
 
+const person = {
+  name: "John Doe",
+  age: 43,
+  langs: ["English", "Japanese"]
+}
+
+const raw = JSON.stringify(person);
+
 export function correctlyTokenize(raw: string): string[] {
   const ans = [];
   for (const token of jsTokens(raw)) {
@@ -7,15 +15,6 @@ export function correctlyTokenize(raw: string): string[] {
   }
   return ans;
 }
-
-const house = {
-  table: 2,
-  piano: 1,
-  kitchen: 1,
-  chair: 10,
-};
-
-const raw = JSON.stringify(house);
 
 export function tokenize(raw: string): string[] {
   let buffer = "";
@@ -62,4 +61,9 @@ export function tokenize(raw: string): string[] {
 }
 
 console.log(tokenize(raw));
-console.log(correctlyTokenize(raw));
+/*
+[
+  "{", "\"name\"", ":", "\"John Doe\"", ",", "\"age\"", ":", "43", ",", "\"langs\"", ":", "[", "\"English\"", ",", "\"Japanese\"",
+  "]", "}"
+]
+*/

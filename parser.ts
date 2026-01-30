@@ -1,29 +1,36 @@
 import { correctlyTokenize } from "./lexer";
 
-const house = {
-  table: 2,
-  piano: 1,
-  kitchen: 1,
-  chair: 10,
-};
+const person = {
+  name: "John Doe",
+  age: 43,
+  langs: ["English", "Japanese"]
+}
 
-const raw = JSON.stringify(house);
+const raw = JSON.stringify(person);
 
 const tokens = correctlyTokenize(raw);
 
 console.log(tokens);
 
+/*
+[
+  "{", "\"name\"", ":", "\"John Doe\"", ",", "\"age\"", ":", "43", ",", "\"langs\"", ":", "[", "\"English\"", ",", "\"Japanese\"",
+  "]", "}"
+]
+*/
+
+// Type definitions for JSON values
 type JsonValue = string | JsonObject | JsonArray;
 type JsonObject = { [key: string]: JsonValue };
 type JsonArray = JsonValue[];
 
 export function parse(tokens: string[]): any {
-  // 現在の読み込み位置を管理するオブジェクト
-  const cursor = { i: 0 };
+  // Shared cursor to track current position in token array
+  let cursor = 0
 
-  // メインの解析関数
+  // Parse any JSON value (object, array, or primitive)
   function parseValue(): JsonValue {
-    const token = tokens[cursor.i];
+    const token = tokens[cursor];
     if (!token) {
       throw new Error("Failed to access token");
     }
@@ -33,61 +40,60 @@ export function parse(tokens: string[]): any {
     } else if (token === "[") {
       return parseArray();
     } else {
-      // 文字列や数値などのリテラル（引用符の除去）
-      cursor.i++;
+      // Primitive value (string/number/boolean)
+      cursor += 1;
       return token.replaceAll('"', "");
     }
   }
 
-  // オブジェクト { ... } の解析
+  // Parse JSON object: { "key": value, ... }
   function parseObject(): JsonObject {
     const obj: JsonObject = {};
-    cursor.i++; // "{" をスキップ
-
-    while (cursor.i < tokens.length && tokens[cursor.i] !== "}") {
-      // 1. キーを取得
-      const key = tokens[cursor.i]?.replaceAll('"', "");
+    cursor += 1; // Skip opening '{'
+    
+    while (cursor < tokens.length && tokens[cursor] !== "}") {
+      // Parse key
+      const key = tokens[cursor]?.replaceAll('"', "");
       if (!key) {
         throw new Error("Failed to get key")
       }
-      cursor.i++;
+      cursor += 1;
 
-      // 2. ":" をスキップ
-      if (tokens[cursor.i] === ":") {
-        cursor.i++;
+      // Skip colon
+      if (tokens[cursor] === ":") {
+        cursor += 1;
       }
 
-      // 3. 値を取得（再帰）
+      // Parse value
       const value = parseValue();
       obj[key] = value;
 
-      // 4. "," があればスキップ（JSON標準対応用、不要なら削除可）
-      if (tokens[cursor.i] === ",") {
-        cursor.i++;
+      // Skip comma if present
+      if (tokens[cursor] === ",") {
+        cursor += 1;
       }
     }
 
-    cursor.i++; // "}" をスキップ
+    cursor += 1; // Skip closing '}'
     return obj;
   }
 
-  // 配列 [ ... ] の解析
+  // Parse JSON array: [ value, value, ... ]
   function parseArray(): JsonArray {
     const arr: JsonArray = [];
-    cursor.i++; // "[" をスキップ
+    cursor += 1; // Skip opening '['
 
-    while (cursor.i < tokens.length && tokens[cursor.i] !== "]") {
-      // 値を取得（再帰）
+    while (cursor < tokens.length && tokens[cursor] !== "]") {
       const value = parseValue();
       arr.push(value);
 
-      // "," があればスキップ
-      if (tokens[cursor.i] === ",") {
-        cursor.i++;
+      // Skip comma if present
+      if (tokens[cursor] === ",") {
+        cursor += 1;
       }
     }
 
-    cursor.i++; // "]" をスキップ
+    cursor += 1; // Skip closing ']'
     return arr;
   }
 
