@@ -1,4 +1,4 @@
-import { correctlyTokenize } from "./token";
+import { correctlyTokenize } from "./lexer";
 
 const house = {
   table: 2,

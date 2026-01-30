@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { correctlyTokenize } from "./token";
-import { parse } from "./parse";
+import { correctlyTokenize } from "./lexer";
+import { parse } from "./parser";
 
 test("string", () => {
   const house = {
