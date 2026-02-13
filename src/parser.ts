@@ -1,10 +1,10 @@
 import { correctlyTokenize } from "./lexer";
 
 const person = {
-  name: "John Doe",
-  age: 43,
-  langs: ["English", "Japanese"]
-}
+	name: "John Doe",
+	age: 43,
+	langs: ["English", "Japanese"],
+};
 
 const raw = JSON.stringify(person);
 
@@ -25,78 +25,78 @@ type JsonObject = { [key: string]: JsonValue };
 type JsonArray = JsonValue[];
 
 export function parse(tokens: string[]): any {
-  // Shared cursor to track current position in token array
-  let cursor = 0
+	// Shared cursor to track current position in token array
+	let cursor = 0;
 
-  // Parse any JSON value (object, array, or primitive)
-  function parseValue(): JsonValue {
-    const token = tokens[cursor];
-    if (!token) {
-      throw new Error("Failed to access token");
-    }
+	// Parse any JSON value (object, array, or primitive)
+	function parseValue(): JsonValue {
+		const token = tokens[cursor];
+		if (!token) {
+			throw new Error("Failed to access token");
+		}
 
-    if (token === "{") {
-      return parseObject();
-    } else if (token === "[") {
-      return parseArray();
-    } else {
-      // Primitive value (string/number/boolean)
-      cursor += 1;
-      return token.replaceAll('"', "");
-    }
-  }
+		if (token === "{") {
+			return parseObject();
+		} else if (token === "[") {
+			return parseArray();
+		} else {
+			// Primitive value (string/number/boolean)
+			cursor += 1;
+			return token.replaceAll('"', "");
+		}
+	}
 
-  // Parse JSON object: { "key": value, ... }
-  function parseObject(): JsonObject {
-    const obj: JsonObject = {};
-    cursor += 1; // Skip opening '{'
-    
-    while (cursor < tokens.length && tokens[cursor] !== "}") {
-      // Parse key
-      const key = tokens[cursor]?.replaceAll('"', "");
-      if (!key) {
-        throw new Error("Failed to get key")
-      }
-      cursor += 1;
+	// Parse JSON object: { "key": value, ... }
+	function parseObject(): JsonObject {
+		const obj: JsonObject = {};
+		cursor += 1; // Skip opening '{'
 
-      // Skip colon
-      if (tokens[cursor] === ":") {
-        cursor += 1;
-      }
+		while (cursor < tokens.length && tokens[cursor] !== "}") {
+			// Parse key
+			const key = tokens[cursor]?.replaceAll('"', "");
+			if (!key) {
+				throw new Error("Failed to get key");
+			}
+			cursor += 1;
 
-      // Parse value
-      const value = parseValue();
-      obj[key] = value;
+			// Skip colon
+			if (tokens[cursor] === ":") {
+				cursor += 1;
+			}
 
-      // Skip comma if present
-      if (tokens[cursor] === ",") {
-        cursor += 1;
-      }
-    }
+			// Parse value
+			const value = parseValue();
+			obj[key] = value;
 
-    cursor += 1; // Skip closing '}'
-    return obj;
-  }
+			// Skip comma if present
+			if (tokens[cursor] === ",") {
+				cursor += 1;
+			}
+		}
 
-  // Parse JSON array: [ value, value, ... ]
-  function parseArray(): JsonArray {
-    const arr: JsonArray = [];
-    cursor += 1; // Skip opening '['
+		cursor += 1; // Skip closing '}'
+		return obj;
+	}
 
-    while (cursor < tokens.length && tokens[cursor] !== "]") {
-      const value = parseValue();
-      arr.push(value);
+	// Parse JSON array: [ value, value, ... ]
+	function parseArray(): JsonArray {
+		const arr: JsonArray = [];
+		cursor += 1; // Skip opening '['
 
-      // Skip comma if present
-      if (tokens[cursor] === ",") {
-        cursor += 1;
-      }
-    }
+		while (cursor < tokens.length && tokens[cursor] !== "]") {
+			const value = parseValue();
+			arr.push(value);
 
-    cursor += 1; // Skip closing ']'
-    return arr;
-  }
+			// Skip comma if present
+			if (tokens[cursor] === ",") {
+				cursor += 1;
+			}
+		}
 
-  return parseValue();
+		cursor += 1; // Skip closing ']'
+		return arr;
+	}
+
+	return parseValue();
 }
 console.log(parse(tokens));

@@ -1,13 +1,17 @@
 {
-  "name": "json-parser",
-  "module": "index.ts",
-  "type": "module",
-  "private": true,
-  "devDependencies": {
-    "@types/bun": "latest",
-    "js-tokens": "^10.0.0"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  }
+	"name": "json-parser",
+	"module": "index.ts",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"fmt": "biome format --write"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.15",
+		"@types/bun": "latest",
+		"js-tokens": "^10.0.0"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
 }
