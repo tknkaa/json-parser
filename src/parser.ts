@@ -42,7 +42,20 @@ export function parse(tokens: string[]): any {
 		} else {
 			// Primitive value (string/number/boolean)
 			cursor += 1;
-			return token.replaceAll('"', "");
+			const unquoted = token.replaceAll('"', "");
+
+			// Try to parse as number
+			if (!isNaN(Number(unquoted)) && unquoted !== "") {
+				return Number(unquoted);
+			}
+
+			// Parse boolean values
+			if (unquoted === "true") return true;
+			if (unquoted === "false") return false;
+			if (unquoted === "null") return null;
+
+			// Return as string
+			return unquoted;
 		}
 	}
 

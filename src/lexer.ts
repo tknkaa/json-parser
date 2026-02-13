@@ -19,43 +19,54 @@ export function correctlyTokenize(raw: string): string[] {
 export function tokenize(raw: string): string[] {
 	let buffer = "";
 	let tokens: string[] = [];
+	let inString = false;
 
 	for (let cursor = 0; cursor < raw.length; cursor++) {
 		const current = raw.charAt(cursor);
+
+		// Handle quote character - toggle string mode
+		if (current === '"') {
+			buffer += current;
+			inString = !inString;
+			continue;
+		}
+
+		// If we're inside a string, add everything to buffer
+		if (inString) {
+			buffer += current;
+			continue;
+		}
+
+		// Outside of strings, process tokens normally
 		switch (current) {
 			case "{":
-				tokens.push(current);
-				break;
-			case "}":
-				tokens.push(buffer);
-				buffer = current;
-				break;
 			case "[":
 				tokens.push(current);
 				break;
+			case "}":
 			case "]":
-				tokens.push(buffer);
-				buffer = current;
-				break;
 			case ":":
-				tokens.push(buffer);
-				tokens.push(current);
-				buffer = "";
-				break;
 			case ",":
-				tokens.push(buffer);
+				if (buffer.length > 0) {
+					tokens.push(buffer);
+					buffer = "";
+				}
 				tokens.push(current);
-				buffer = "";
+				break;
+			case "\n":
+			case " ":
+				if (buffer.length == 0) {
+					continue;
+				}
+				buffer += current;
 				break;
 			default:
 				buffer += current;
 		}
 	}
-	const lastChar = raw.at(raw.length - 1);
-	if (!lastChar) {
-		throw new Error("Failed to get the last character");
+	if (buffer.length > 0) {
+		tokens.push(buffer);
 	}
-	tokens.push(lastChar);
 
 	return tokens;
 }
